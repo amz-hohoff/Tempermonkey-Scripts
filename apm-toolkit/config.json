@@ -1,0 +1,30 @@
+{
+    "_info": {
+        "beschreibung": "APM Toolkit – Zentrale Konfiguration",
+        "hinweis":      "Änderungen hier sind sofort für ALLE Nutzer aktiv (kein Update nötig).",
+        "syntax":       "Gültiges JSON – Kommas, Anführungszeichen und Klammern prüfen!",
+        "zeilenumbruch":"Für Zeilenumbrüche im Text: \\n verwenden"
+    },
+
+    "prefixOptions": [
+        {
+            "label": "FWO-(temp)",
+            "desc":  "Temporäre WorkOrder → Wird direkt geschlossen"
+        },
+        {
+            "label": "[BELT-RISK]",
+            "desc":  "BeltReliability Dashboard WorkOrder"
+        }
+    ],
+
+    "commentTemplates": [
+        {
+            "title": "FWO - open",
+            "text":  "Problembeschreibung:\nLösungsansatz:\n\nGeforderte Downtime:\nAnzahl geforderter Techniker:\n\nParts:\nBin:"
+        },
+        {
+            "title": "FWO - closing",
+            "text":  "War die Problembeschreibung zutreffend? \n\nWurde die Reparatur durchgeführt?\n\nWenn nein, was wurde dann gemacht, um das Problem zu beheben?"
+        }
+    ]
+}
