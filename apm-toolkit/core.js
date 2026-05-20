@@ -177,6 +177,56 @@ function findCommentTextarea() {
     return document.querySelector('textarea[name="udfnote01"].x-form-text[aria-readonly="false"]:not([aria-disabled="true"])');
 }
 
+
+/**
+ * Fügt ein Comment-Template in die Textarea ein.
+ *
+ * Optionale Template-Felder (config.json):
+ *   guardLine     – Wenn die erste Zeile des Felds exakt diesem String entspricht,
+ *                   wird das Template NICHT eingefügt (Schutz vor Doppelung).
+ *   appendWithDate – true → Inhalt wird IMMER angehängt (nie ersetzt),
+ *                   mit "___UPDATE-DD/MM/YY___" als Trenner.
+ */
+function applyCommentTemplate(textarea, tpl) {
+    const current = textarea.value;
+
+    // ── Guard: Doppelung verhindern ──────────────────────────────────────────
+    if (tpl.guardLine) {
+        const firstLine = current.split('\n')[0].trim();
+        if (firstLine === tpl.guardLine.trim()) {
+            // Visuelles Feedback: Button kurz orange färben
+            const btn = document.getElementById(COMMENT_BTN_ID);
+            if (btn) {
+                const prev = btn.style.backgroundColor;
+                btn.textContent       = '⚠ Bereits vorhanden';
+                btn.style.backgroundColor = '#e67e22';
+                setTimeout(() => {
+                    btn.textContent        = '▾ Comment';
+                    btn.style.backgroundColor = prev;
+                }, 2000);
+            }
+            return;
+        }
+    }
+
+    // ── Anhängen mit Datums-Trenner ──────────────────────────────────────────
+    if (tpl.appendWithDate) {
+        const now = new Date();
+        const dd  = String(now.getDate()).padStart(2, '0');
+        const mm  = String(now.getMonth() + 1).padStart(2, '0');
+        const yy  = String(now.getFullYear()).slice(-2);
+        const sep = `___UPDATE-${dd}/${mm}/${yy}___`;
+        const newValue = current
+            ? current.trimEnd() + '\n\n' + sep + '\n' + tpl.text
+            : tpl.text;
+        setExtValue(textarea, newValue);
+        return;
+    }
+
+    // ── Standard: ersetzen ───────────────────────────────────────────────────
+    setExtValue(textarea, tpl.text);
+}
+
 function buildCommentDropdown(textarea) {
     let drop = document.getElementById(COMMENT_DROP_ID);
     if (drop) { drop._textarea = textarea; return drop; }
@@ -195,7 +245,7 @@ function buildCommentDropdown(textarea) {
         Object.assign(row.style, { padding: '9px 16px', cursor: 'pointer', color: '#1a1a1a', fontSize: '13px', transition: 'background 0.08s', whiteSpace: 'nowrap', borderBottom: i < COMMENT_TEMPLATES.length - 1 ? '1px solid #f0f0f0' : 'none' });
         row.addEventListener('mouseenter', () => { row.style.backgroundColor = '#e8f0fe'; row.style.color = '#0d47a1'; });
         row.addEventListener('mouseleave', () => { row.style.backgroundColor = '';        row.style.color = '#1a1a1a'; });
-        row.addEventListener('mousedown', e => { e.preventDefault(); setExtValue(drop._textarea, tpl.text); closeCommentDropdown(); });
+        row.addEventListener('mousedown', e => { e.preventDefault(); applyCommentTemplate(drop._textarea, tpl); closeCommentDropdown(); });
         drop.appendChild(row);
     });
     return drop;
