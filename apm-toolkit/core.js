@@ -55,6 +55,25 @@ function attachButtonToField(el, btn) {
     }
 }
 
+/** Hängt den Button absolut oben-rechts INNERHALB der Textarea-Box ein */
+function attachButtonToTextarea(el, btn) {
+    const triggerWrap = el.closest('.x-form-trigger-wrap');
+    if (!triggerWrap) { el.insertAdjacentElement('afterend', btn); return; }
+
+    // Originalgröße behalten – kein Flex, nur relative Positionierung für den Button
+    triggerWrap.style.position = 'relative';
+
+    // Button absolut oben rechts innerhalb der Textarea-Box
+    btn.style.position   = 'absolute';
+    btn.style.top        = '4px';
+    btn.style.right      = '4px';
+    btn.style.marginLeft = '0';
+    btn.style.zIndex     = '100';
+
+    triggerWrap.appendChild(btn);
+}
+
+
 function positionDropdown(drop, btn, minWidth) {
     const rect = btn.getBoundingClientRect();
     let left = rect.left;
@@ -198,7 +217,7 @@ function injectCommentButton(textarea) {
         if (drop.style.display !== 'none') { closeCommentDropdown(); }
         else { closeAllDropdowns(); positionDropdown(drop, btn, 220); drop.style.display = 'block'; openDropdowns.add(closeCommentDropdown); }
     });
-    attachButtonToField(textarea, btn);
+    attachButtonToTextarea(textarea, btn);
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
