@@ -281,9 +281,57 @@ function init() {
     if (commentArea) injectCommentButton(commentArea);
 }
 
+/** Prüft ob ein Input/Textarea gerade editierbar ist */
+function isEditable(el) {
+    if (!el) return false;
+    return el.getAttribute('aria-readonly') !== 'true'
+        && el.getAttribute('aria-disabled') !== 'true';
+}
+
 const observer = new MutationObserver(() => {
-    if (!document.getElementById(PREFIX_BTN_ID))  { const el = findTitleInput();      if (el) injectPrefixButton(el);  }
-    if (!document.getElementById(COMMENT_BTN_ID)) { const el = findCommentTextarea(); if (el) injectCommentButton(el); }
+    // ── Präfix-Button: nur anzeigen wenn Titelfeld editierbar ──────────────
+    const prefixBtn  = document.getElementById(PREFIX_BTN_ID);
+    const titleInput = document.querySelector('input[name="description"].x-form-text');
+
+    if (titleInput) {
+        if (isEditable(titleInput)) {
+            // Feld editierbar → Button injizieren (falls fehlend) oder einblenden
+            if (!prefixBtn) {
+                injectPrefixButton(titleInput);
+            } else {
+                prefixBtn.style.display = 'inline-block';
+            }
+        } else {
+            // Feld readonly/disabled → Button ausblenden + Dropdown schließen
+            if (prefixBtn) {
+                prefixBtn.style.display = 'none';
+                closePrefixDropdown();
+            }
+        }
+    } else if (prefixBtn) {
+        prefixBtn.style.display = 'none';
+    }
+
+    // ── Comment-Button: nur anzeigen wenn Kommentarfeld editierbar ──────────
+    const commentBtn  = document.getElementById(COMMENT_BTN_ID);
+    const commentArea = document.querySelector('textarea[name="udfnote01"].x-form-text');
+
+    if (commentArea) {
+        if (isEditable(commentArea)) {
+            if (!commentBtn) {
+                injectCommentButton(commentArea);
+            } else {
+                commentBtn.style.display = 'inline-block';
+            }
+        } else {
+            if (commentBtn) {
+                commentBtn.style.display = 'none';
+                closeCommentDropdown();
+            }
+        }
+    } else if (commentBtn) {
+        commentBtn.style.display = 'none';
+    }
 });
 observer.observe(document.body, { childList: true, subtree: true });
 setTimeout(init, 800);
