@@ -12,6 +12,10 @@
             "desc": "Temporäre WorkOrder → Wird direkt geschlossen"
         },
         {
+            "label": "[CHANGE-TICKET]",
+            "desc": "Für Arbeiten an Change Projekten"
+        },
+        {
             "label": "[BELT-RISK]",
             "desc": "BeltReliability Dashboard WorkOrder"
         }
