@@ -9,7 +9,7 @@ Jedes Script lädt seine Konfiguration automatisch von hier – Änderungen sind
 
 | Script | Beschreibung | Installieren |
 |--------|-------------|--------------|
-| [APM Toolkit](./apm-toolkit/) | Titel-Präfix & Comment-Templates für EAM/APM | [→ Installieren](https://raw.githubusercontent.com/amz-hohoff/tampermonkey-scripts/main/apm-toolkit/loader.user.js) |
+| [APM Toolkit](./apm-toolkit/) | Titel-Präfix & Comment-Templates für EAM/APM | [→ Installieren](https://raw.githubusercontent.com/amz-hohoff/Tempermonkey-Scripts/main/apm-toolkit/loader.user.js) |
 
 ---
 
