@@ -150,6 +150,33 @@ function applyPrefix(input, label) {
     }
     setExtValue(input, label + ' ' + current);
 }
+/** Entfernt einen Präfix vom Titelanfang.
+ *  Reihenfolge:
+ *  1. Bekannte Präfixe aus PREFIX_OPTIONS
+ *  2. Regex-Fallback: [IRGENDWAS] oder WORT-(WORT) – greift auch für
+ *     zukünftige Präfixe die noch nicht in der Config stehen. */
+function clearPrefix(input) {
+    let current = input.value;
+
+    // 1. Bekannte Optionen
+    for (const opt of PREFIX_OPTIONS) {
+        if (current.startsWith(opt.label + ' ')) {
+            setExtValue(input, current.slice(opt.label.length + 1));
+            return;
+        }
+        if (current === opt.label) {
+            setExtValue(input, '');
+            return;
+        }
+    }
+
+    // 2. Regex-Fallback: [WORT], [WORT-WORT], WORT-(WORT), WORT-(WORT-WORT) …
+    const cleaned = current.replace(/^(\[[\w\s\-]+\]|[\w\-]+\([^\)]+\))\s*/, '');
+    if (cleaned !== current) {
+        setExtValue(input, cleaned);
+    }
+}
+
 
 function buildPrefixDropdown(input) {
     let drop = document.getElementById(PREFIX_DROP_ID);
@@ -182,6 +209,42 @@ function buildPrefixDropdown(input) {
         row.addEventListener('mousedown', e => { e.preventDefault(); applyPrefix(drop._input, opt.label); closePrefixDropdown(); });
         row.appendChild(lbl); row.appendChild(dsc); drop.appendChild(row);
     });
+
+    // ── Separator ──────────────────────────────────────────────────────────
+    const sep = document.createElement('div');
+    Object.assign(sep.style, {
+        height:           '1px',
+        backgroundColor:  '#e0e0e0',
+        margin:           '3px 0',
+    });
+    drop.appendChild(sep);
+
+    // ── Clear-Eintrag ───────────────────────────────────────────────────────
+    const clearRow = document.createElement('div');
+    clearRow.textContent = '✕  Clear Präfix';
+    Object.assign(clearRow.style, {
+        padding:    '7px 16px',
+        cursor:     'pointer',
+        color:      '#999',
+        fontSize:   '12px',
+        transition: 'background 0.08s',
+        whiteSpace: 'nowrap',
+    });
+    clearRow.addEventListener('mouseenter', () => {
+        clearRow.style.backgroundColor = '#fdecea';
+        clearRow.style.color           = '#c0392b';
+    });
+    clearRow.addEventListener('mouseleave', () => {
+        clearRow.style.backgroundColor = '';
+        clearRow.style.color           = '#999';
+    });
+    clearRow.addEventListener('mousedown', e => {
+        e.preventDefault();
+        clearPrefix(drop._input);
+        closePrefixDropdown();
+    });
+    drop.appendChild(clearRow);
+
     return drop;
 }
 
