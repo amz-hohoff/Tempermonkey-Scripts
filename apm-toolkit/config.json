@@ -30,6 +30,10 @@
             "title": "FWO - closing",
             "appendWithDate": true,
             "text": "War die Problembeschreibung zutreffend? \n\nWurde die Reparatur durchgeführt?\n\nWenn nein, was wurde dann gemacht, um das Problem zu beheben?"
+        },
+        {
+            "title": "BELT-RISK - checked",
+            "text": "Belt Risk Check – No issues found.\n\nChecked:\n- Overall condition\n- Wear\n- Track alignment\n- Connection welding point"
         }
     ]
 }
