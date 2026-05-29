@@ -33,7 +33,8 @@
         },
         {
             "title": "BELT-RISK - checked",
-            "text": "Belt Risk Check – No issues found.\n\nChecked:\n- Overall condition\n- Wear\n- Track alignment\n- Connection welding point"
+            "text": "Belt Risk Check – No issues found.\n\nChecked:\n- Overall condition\n- Wear\n- Track alignment\n- Connection welding point",
+            "appendWithDate": true
         }
     ]
 }
