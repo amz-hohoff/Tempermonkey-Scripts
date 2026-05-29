@@ -55,22 +55,58 @@ function attachButtonToField(el, btn) {
     }
 }
 
-/** Hängt den Button absolut oben-rechts INNERHALB der Textarea-Box ein */
+/** Hängt den Comment-Button in die Label-Spalte links der Textarea.
+ *  Responsive: bei wenig Platz wird der Text ausgeblendet → nur "▾" sichtbar. */
 function attachButtonToTextarea(el, btn) {
-    const triggerWrap = el.closest('.x-form-trigger-wrap');
-    if (!triggerWrap) { el.insertAdjacentElement('afterend', btn); return; }
+    const formItem = el.closest('.x-form-item');
+    const labelEl  = formItem ? formItem.querySelector('.x-form-item-label') : null;
 
-    // Originalgröße behalten – kein Flex, nur relative Positionierung für den Button
-    triggerWrap.style.position = 'relative';
+    if (labelEl) {
+        // Button unterhalb des Label-Texts platzieren
+        btn.style.position    = 'static';
+        btn.style.marginLeft  = '0';
+        btn.style.marginTop   = '6px';
+        btn.style.width       = 'calc(100% - 2px)';
+        btn.style.boxSizing   = 'border-box';
+        btn.style.textOverflow = 'clip';
+        btn.style.overflow    = 'hidden';
 
-    // Button absolut oben rechts innerhalb der Textarea-Box
-    btn.style.position   = 'absolute';
-    btn.style.top        = '4px';
-    btn.style.right      = '4px';
-    btn.style.marginLeft = '0';
-    btn.style.zIndex     = '100';
+        // Label-Zelle als Flex-Column layouten
+        Object.assign(labelEl.style, {
+            display:       'flex',
+            flexDirection: 'column',
+            alignItems:    'flex-end',
+            height:        'auto',
+            paddingBottom: '4px',
+        });
+        labelEl.appendChild(btn);
 
-    triggerWrap.appendChild(btn);
+        // Responsive: Text ausblenden wenn zu wenig Platz
+        const FULL_LABEL = '▾ Comment';
+        const MINI_LABEL = '▾';
+        const THRESHOLD  = 88; // px – darunter nur Pfeil
+
+        const updateText = () => {
+            const w = labelEl.getBoundingClientRect().width;
+            btn.textContent = w > 0 && w < THRESHOLD ? MINI_LABEL : FULL_LABEL;
+        };
+
+        const ro = new ResizeObserver(updateText);
+        ro.observe(labelEl);
+        updateText(); // sofort einmal auswerten
+
+    } else {
+        // Fallback: absolut oben-rechts in der Textarea-Box
+        const triggerWrap = el.closest('.x-form-trigger-wrap');
+        if (!triggerWrap) { el.insertAdjacentElement('afterend', btn); return; }
+        triggerWrap.style.position = 'relative';
+        btn.style.position   = 'absolute';
+        btn.style.top        = '4px';
+        btn.style.right      = '4px';
+        btn.style.marginLeft = '0';
+        btn.style.zIndex     = '100';
+        triggerWrap.appendChild(btn);
+    }
 }
 
 
@@ -192,8 +228,8 @@ function applyCommentTemplate(textarea, tpl) {
 
     // ── Guard: Doppelung verhindern ──────────────────────────────────────────
     if (tpl.guardLine) {
-        const firstLine = current.split('\n')[0].trim();
-        if (firstLine === tpl.guardLine.trim()) {
+        // Schützt auch bearbeiteten Text – solange der Schlüsselbegriff irgendwo vorkommt
+        if (current.includes(tpl.guardLine.trim())) {
             // Visuelles Feedback: Button kurz orange färben
             const btn = document.getElementById(COMMENT_BTN_ID);
             if (btn) {
