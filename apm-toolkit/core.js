@@ -56,44 +56,43 @@ function attachButtonToField(el, btn) {
 }
 
 /** Hängt den Comment-Button in die Label-Spalte links der Textarea.
+ *  Nicht-invasiv: kein Flex auf dem Label-Element → Textarea-Layout bleibt original.
  *  Responsive: bei wenig Platz wird der Text ausgeblendet → nur "▾" sichtbar. */
 function attachButtonToTextarea(el, btn) {
     const formItem = el.closest('.x-form-item');
     const labelEl  = formItem ? formItem.querySelector('.x-form-item-label') : null;
 
     if (labelEl) {
-        // Button unterhalb des Label-Texts platzieren
-        btn.style.position    = 'static';
-        btn.style.marginLeft  = '0';
-        btn.style.marginTop   = '6px';
-        btn.style.width       = 'calc(100% - 2px)';
-        btn.style.boxSizing   = 'border-box';
-        btn.style.textOverflow = 'clip';
-        btn.style.overflow    = 'hidden';
-
-        // Label-Zelle als Flex-Column layouten
-        Object.assign(labelEl.style, {
-            display:       'flex',
-            flexDirection: 'column',
-            alignItems:    'flex-end',
-            height:        'auto',
-            paddingBottom: '4px',
+        // Wrapper-Div: kein Eingriff in das Label-Layout, nur Block-Container
+        const wrapper = document.createElement('div');
+        Object.assign(wrapper.style, {
+            textAlign:    'right',
+            paddingRight: '8px',   // passend zum Label-padding-right
+            marginTop:    '5px',
         });
-        labelEl.appendChild(btn);
 
-        // Responsive: Text ausblenden wenn zu wenig Platz
-        const FULL_LABEL = '▾ Comment';
-        const MINI_LABEL = '▾';
-        const THRESHOLD  = 88; // px – darunter nur Pfeil
+        // Button: width auto, kein calc() – nur so breit wie der Text
+        btn.style.position   = 'static';
+        btn.style.marginLeft = '0';
+        btn.style.width      = 'auto';
+        btn.style.maxWidth   = '100%';
+
+        wrapper.appendChild(btn);
+        labelEl.appendChild(wrapper);
+
+        // Responsive: Text ausblenden wenn Label-Zelle zu schmal
+        const FULL = '▾ Comment';
+        const MINI = '▾';
+        const THRESHOLD = 88; // px
 
         const updateText = () => {
             const w = labelEl.getBoundingClientRect().width;
-            btn.textContent = w > 0 && w < THRESHOLD ? MINI_LABEL : FULL_LABEL;
+            btn.textContent = (w > 0 && w < THRESHOLD) ? MINI : FULL;
         };
 
         const ro = new ResizeObserver(updateText);
         ro.observe(labelEl);
-        updateText(); // sofort einmal auswerten
+        updateText();
 
     } else {
         // Fallback: absolut oben-rechts in der Textarea-Box
